@@ -10,6 +10,7 @@ services:
       - ./mlflow.db:/app/mlflow.db
       - ./mlflow-artifacts:/app/mlflow-artifacts
       - ./.dvc:/app/.dvc
+      - ./.git:/app/.git
       - ./dvc.lock:/app/dvc.lock
 
   api:
@@ -20,5 +21,3 @@ services:
       - "8000:8000"
     volumes:
       - ./models:/app/models:ro
-    depends_on:
-      - train

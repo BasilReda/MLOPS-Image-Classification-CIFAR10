@@ -34,6 +34,7 @@
   const confidenceValue = document.getElementById("confidenceValue");
   const explanationText = document.getElementById("explanationText");
   const probList = document.getElementById("probList");
+  const resetBtn = document.getElementById("resetBtn");
 
   let selectedFile = null;
 
@@ -97,6 +98,22 @@
   dropzone.addEventListener("drop", (e) => {
     const file = e.dataTransfer.files && e.dataTransfer.files[0];
     setSelectedFile(file);
+  });
+
+  function resetState() {
+    selectedFile = null;
+    fileInput.value = "";
+    previewImg.src = "";
+    previewImg.hidden = true;
+    dropzoneEmpty.hidden = false;
+    analyzeBtn.disabled = true;
+    resultPanel.hidden = true;
+    hideError();
+  }
+
+  resetBtn.addEventListener("click", () => {
+    resetState();
+    fileInput.click();
   });
 
   // ---- Analyze -----------------------------------------------------------

@@ -228,6 +228,19 @@ body {
   cursor: not-allowed;
 }
 
+.btn-secondary {
+  background: var(--panel-bg);
+  color: var(--text);
+  border: 1px solid var(--border);
+  margin-top: 18px;
+}
+
+.btn-secondary:hover {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
 .error-msg {
   margin: 12px 0 0;
   padding: 10px 12px;
