@@ -1,0 +1,87 @@
+stages:
+  download_data:
+    cmd: python scripts/download_data.py --params params.yaml
+    deps:
+      - scripts/download_data.py
+      - src/kd_pipeline/data.py
+    params:
+      - data
+    outs:
+      - data/raw
+
+  train_teacher:
+    cmd: python scripts/train_teacher.py --params params.yaml
+    deps:
+      - scripts/train_teacher.py
+      - src/kd_pipeline/models.py
+      - src/kd_pipeline/engine.py
+      - src/kd_pipeline/data.py
+      - data/raw
+    params:
+      - seed
+      - data
+      - teacher
+    outs:
+      - models/teacher/teacher_state_dict.pt
+    metrics:
+      - reports/metrics/teacher_metrics.json:
+          cache: false
+    plots:
+      - reports/figures/teacher_loss_curve.png:
+          cache: false
+
+  train_student_baseline:
+    cmd: python scripts/train_student_baseline.py --params params.yaml
+    deps:
+      - scripts/train_student_baseline.py
+      - src/kd_pipeline/models.py
+      - src/kd_pipeline/engine.py
+      - src/kd_pipeline/data.py
+      - data/raw
+    params:
+      - seed
+      - data
+      - student_baseline
+    outs:
+      - models/student_baseline/student_baseline_state_dict.pt
+    metrics:
+      - reports/metrics/student_baseline_metrics.json:
+          cache: false
+
+  distill_student:
+    cmd: python scripts/distill_student.py --params params.yaml
+    deps:
+      - scripts/distill_student.py
+      - src/kd_pipeline/distill.py
+      - src/kd_pipeline/models.py
+      - models/teacher/teacher_state_dict.pt
+      - data/raw
+    params:
+      - seed
+      - data
+      - distill
+    outs:
+      - models/student_distilled/student_distilled_state_dict.pt
+    metrics:
+      - reports/metrics/distill_metrics.json:
+          cache: false
+    plots:
+      - reports/figures/kd_loss_curve.png:
+          cache: false
+
+  evaluate:
+    cmd: python scripts/evaluate.py --params params.yaml
+    deps:
+      - scripts/evaluate.py
+      - models/teacher/teacher_state_dict.pt
+      - models/student_baseline/student_baseline_state_dict.pt
+      - models/student_distilled/student_distilled_state_dict.pt
+      - data/raw
+    params:
+      - evaluate
+    metrics:
+      - reports/metrics/comparison.json:
+          cache: false
+    plots:
+      - reports/figures/prediction_grid.png:
+          cache: false

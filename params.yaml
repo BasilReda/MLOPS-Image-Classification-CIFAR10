@@ -1,0 +1,50 @@
+seed: 42
+
+data:
+  raw_dir: data/raw
+  download: true
+  batch_size: 64
+  num_workers: 2
+  val_fraction: 0.1
+  normalize_mean: [0.4914, 0.4822, 0.4465]
+  normalize_std: [0.2470, 0.2435, 0.2616]
+  max_samples: null  # set by CI smoke-test overrides to truncate the dataset
+
+teacher:
+  arch: DeepNN
+  epochs: 100
+  learning_rate: 0.001
+  patience: 5
+  checkpoint: models/teacher/teacher_state_dict.pt
+  metrics_path: reports/metrics/teacher_metrics.json
+  loss_curve_path: reports/figures/teacher_loss_curve.png
+
+student_baseline:
+  arch: LightNN
+  epochs: 10
+  learning_rate: 0.001
+  patience: 5
+  checkpoint: models/student_baseline/student_baseline_state_dict.pt
+  metrics_path: reports/metrics/student_baseline_metrics.json
+
+distill:
+  student_arch: LightNN
+  epochs: 10
+  learning_rate: 0.001
+  temperature: 2
+  soft_target_loss_weight: 0.25
+  ce_loss_weight: 0.75
+  checkpoint: models/student_distilled/student_distilled_state_dict.pt
+  metrics_path: reports/metrics/distill_metrics.json
+  loss_curve_path: reports/figures/kd_loss_curve.png
+
+evaluate:
+  demo_seed: 123
+  num_demo_samples: 6
+  comparison_path: reports/metrics/comparison.json
+  prediction_grid_path: reports/figures/prediction_grid.png
+
+mlflow:
+  tracking_uri: sqlite:///mlflow.db
+  artifact_location: ./mlflow-artifacts
+  experiment_name: kd-cifar10
