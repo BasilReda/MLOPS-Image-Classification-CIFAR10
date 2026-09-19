@@ -9,7 +9,7 @@ class ClassProbability(BaseModel):
 class PredictionResponse(BaseModel):
     class_name: str
     confidence: float
-    top3: list[ClassProbability]
+    probabilities: list[ClassProbability]  # all classes, sorted descending by probability
 
 
 class HealthResponse(BaseModel):

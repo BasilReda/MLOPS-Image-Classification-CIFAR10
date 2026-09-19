@@ -11,6 +11,7 @@ tracking, Docker packaging, CI, and a FastAPI serving endpoint.
 src/kd_pipeline/   reusable, unit-tested logic (data, models, training, distillation, I/O)
 scripts/           thin CLI entrypoints, one per DVC stage
 api/                FastAPI serving app for the distilled student
+frontend/           static HTML/CSS/JS UI, served by the API app itself
 tests/              pytest unit tests (no real training)
 notebooks/          exploratory notebook that calls into src/kd_pipeline
 params.yaml         single source of truth for hyperparameters
@@ -63,14 +64,20 @@ docker compose up train      # runs dvc repro in a container
 docker compose up api        # serves the FastAPI app on :8000
 ```
 
-## Serving API
+## Serving API + frontend
 
 ```powershell
 uvicorn api.main:app --reload
 ```
 
 - `GET /health`
-- `POST /predict` — multipart image upload, returns predicted class + confidence + top-3.
+- `POST /predict` — multipart image upload, returns predicted class, confidence, and the full
+  ranked probability distribution over all 10 classes.
+- `GET /` — serves `frontend/index.html`, a static, dependency-free UI: drag-and-drop an image,
+  see the predicted class with a confidence ring, a bar chart of all 10 class probabilities, and
+  a plain-language explanation of *why* (confidence level + margin over the runner-up class,
+  grounded in the actual returned probabilities — not a fabricated explanation). Same-origin, no
+  build step, no CORS needed since the API serves it directly.
 
 ## Notes on the original notebook
 

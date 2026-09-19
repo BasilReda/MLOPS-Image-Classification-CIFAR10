@@ -46,7 +46,10 @@ def test_predict_endpoint_returns_well_formed_response(client):
     }
     assert body["class_name"] in known_classes
     assert 0.0 <= body["confidence"] <= 1.0
-    assert len(body["top3"]) == 3
+    assert len(body["probabilities"]) == 10
+    assert body["probabilities"][0]["class_name"] == body["class_name"]
+    probs = [p["probability"] for p in body["probabilities"]]
+    assert probs == sorted(probs, reverse=True)
 
 
 def test_predict_endpoint_rejects_non_image(client):
@@ -54,3 +57,10 @@ def test_predict_endpoint_rejects_non_image(client):
         "/predict", files={"file": ("test.txt", b"not an image", "text/plain")}
     )
     assert resp.status_code == 400
+
+
+def test_frontend_is_served_at_root(client):
+    resp = client.get("/")
+    assert resp.status_code == 200
+    assert "text/html" in resp.headers["content-type"]
+    assert "CIFAR-10 Student Classifier" in resp.text

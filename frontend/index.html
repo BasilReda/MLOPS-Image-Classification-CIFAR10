@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CIFAR-10 Student Classifier</title>
+  <meta name="description" content="Upload an image and see what the knowledge-distilled CIFAR-10 student model predicts, and why." />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true">&#9670;</span>
+        <div>
+          <h1>CIFAR-10 Student Classifier</h1>
+          <p class="subtitle">Knowledge-distilled model &middot; predicts one of 10 object classes</p>
+        </div>
+      </div>
+      <span class="health-pill" id="healthPill" role="status">checking&hellip;</span>
+    </header>
+
+    <main class="layout">
+      <section class="panel upload-panel">
+        <h2 class="panel-title">1. Upload an image</h2>
+
+        <label class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload an image">
+          <input type="file" id="fileInput" accept="image/*" hidden />
+          <div class="dropzone-empty" id="dropzoneEmpty">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 16V4M12 4L7 9M12 4l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <p><strong>Drop an image</strong> or click to browse</p>
+            <p class="hint">PNG or JPG &middot; resized to 32&times;32 for the model, same as training</p>
+          </div>
+          <img id="previewImg" class="preview-img" alt="Selected image preview" hidden />
+        </label>
+
+        <button id="analyzeBtn" class="btn btn-primary" disabled type="button">Analyze image</button>
+        <p id="errorMsg" class="error-msg" role="alert" hidden></p>
+      </section>
+
+      <section class="panel result-panel" id="resultPanel" hidden>
+        <h2 class="panel-title">2. Prediction</h2>
+
+        <div class="result-header">
+          <div class="predicted-label">
+            <span class="predicted-icon" id="predictedIcon" aria-hidden="true">?</span>
+            <div>
+              <p class="eyebrow">Predicted class</p>
+              <p class="predicted-class" id="predictedClass">&mdash;</p>
+            </div>
+          </div>
+          <div class="confidence-ring" id="confidenceRing" aria-hidden="true">
+            <svg viewBox="0 0 100 100">
+              <circle class="ring-track" cx="50" cy="50" r="42"></circle>
+              <circle class="ring-progress" id="ringProgress" cx="50" cy="50" r="42"></circle>
+            </svg>
+            <span class="confidence-value" id="confidenceValue">0%</span>
+          </div>
+        </div>
+
+        <div class="explanation">
+          <h3>Why this prediction?</h3>
+          <p id="explanationText"></p>
+        </div>
+
+        <div class="probabilities">
+          <h3>Class probabilities</h3>
+          <ul class="prob-list" id="probList"></ul>
+        </div>
+      </section>
+
+      <section class="panel loading-panel" id="loadingPanel" hidden aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Running inference&hellip;</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        Served by a <strong>LightNN</strong> student network, distilled from a larger <strong>DeepNN</strong> teacher on
+        CIFAR-10. Trained and versioned with DVC + MLflow.
+      </p>
+    </footer>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

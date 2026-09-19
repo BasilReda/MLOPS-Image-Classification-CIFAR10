@@ -16,8 +16,9 @@ RUN pip install --no-cache-dir -e .
 FROM base AS train
 ENTRYPOINT ["dvc", "repro"]
 
-# ---- serve: runs the FastAPI inference service ----
+# ---- serve: runs the FastAPI inference service + static frontend ----
 FROM base AS serve
 COPY api/ api/
+COPY frontend/ frontend/
 EXPOSE 8000
 ENTRYPOINT ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -42,13 +42,13 @@ class Predictor:
             probs = F.softmax(logits, dim=1).squeeze(0)
 
         confidence, pred_idx = probs.max(dim=0)
-        top3_values, top3_indices = probs.topk(3)
+        ranked_values, ranked_indices = probs.topk(len(CLASS_NAMES))
 
         return {
             "class_name": CLASS_NAMES[pred_idx.item()],
             "confidence": confidence.item(),
-            "top3": [
+            "probabilities": [
                 {"class_name": CLASS_NAMES[i.item()], "probability": v.item()}
-                for v, i in zip(top3_values, top3_indices)
+                for v, i in zip(ranked_values, ranked_indices)
             ],
         }
