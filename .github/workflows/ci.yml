@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install ruff
+      - run: ruff check .
+
+  test:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -r requirements-dev.txt
+      - run: pip install -e .
+      - run: pytest tests/ -v --maxfail=1
+
+  smoke-pipeline:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+      - run: pip install -r requirements.txt
+      - run: pip install -e .
+      - name: Run truncated pipeline as a DVC experiment (wiring smoke-test)
+        run: |
+          dvc init --no-scm -f
+          dvc exp run \
+            -S data.max_samples=200 \
+            -S teacher.epochs=1 \
+            -S student_baseline.epochs=1 \
+            -S distill.epochs=1
+      - name: Assert expected outputs exist
+        run: |
+          test -f models/teacher/teacher_state_dict.pt
+          test -f models/student_baseline/student_baseline_state_dict.pt
+          test -f models/student_distilled/student_distilled_state_dict.pt
+          test -f reports/metrics/comparison.json

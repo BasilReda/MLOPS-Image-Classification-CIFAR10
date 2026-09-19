@@ -1,0 +1,24 @@
+services:
+  train:
+    build:
+      context: .
+      target: train
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./reports:/app/reports
+      - ./mlflow.db:/app/mlflow.db
+      - ./mlflow-artifacts:/app/mlflow-artifacts
+      - ./.dvc:/app/.dvc
+      - ./dvc.lock:/app/dvc.lock
+
+  api:
+    build:
+      context: .
+      target: serve
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./models:/app/models:ro
+    depends_on:
+      - train
